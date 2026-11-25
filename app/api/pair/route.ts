@@ -1,0 +1,2 @@
+import {sql} from "@/lib/db";import {NextResponse} from "next/server";import {makePairingCode} from "@/lib/pairing";import {errorResponse} from "@/lib/http";
+export async function POST(){try{for(let i=0;i<8;i++){const code=makePairingCode();const rows=await sql`INSERT INTO pos_sessions(session_code) VALUES(${code}) ON CONFLICT DO NOTHING RETURNING session_code`;if(rows.length)return NextResponse.json({session_code:code})}throw new Error("ไม่สามารถสร้างรหัสได้ กรุณาลองอีกครั้ง")}catch(e){return errorResponse(e,500)}}

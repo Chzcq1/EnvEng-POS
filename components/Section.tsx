@@ -1,0 +1,1 @@
+import type {ReactNode} from "react";export function Section({title,description,children}:{title:string;description?:string;children:ReactNode}){return <section className="space-y-4"><div><h1 className="text-2xl font-black text-eco-900">{title}</h1>{description&&<p className="mt-1 text-sm text-slate-500">{description}</p>}</div>{children}</section>}

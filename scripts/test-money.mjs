@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import { calculateCart, calculateCash, calculateTransfer } from "../lib/money.ts";
+const cart=[{id:"a",name:"กระทง",price:20,quantity:2},{id:"b",name:"เทียน",price:15,quantity:1}];
+const totals=calculateCart(cart,10);
+assert.deepEqual(totals,{subtotal:55,discount:10,total:45});
+assert.deepEqual(calculateCart(cart,999),{subtotal:55,discount:55,total:0});
+assert.deepEqual(calculateCash(45,50,false),{received:50,change_amount:5,donation:0});
+assert.deepEqual(calculateCash(45,50,true),{received:50,change_amount:0,donation:5});
+assert.deepEqual(calculateTransfer(45,50),{received:50,change_amount:0,donation:5});
+assert.throws(()=>calculateCash(45,44,false),/เงินที่รับมายังไม่ครบ/);
+assert.throws(()=>calculateTransfer(45,44),/ยอดโอนที่ยืนยันต้องไม่น้อยกว่า/);
+assert.equal(calculateCart([{id:"c",name:"x",price:10.1,quantity:3}],0).subtotal,30.3);
+console.log("PASS: discount, cap, exact change, change donation, transfer overpayment, insufficient payment, decimal rounding");

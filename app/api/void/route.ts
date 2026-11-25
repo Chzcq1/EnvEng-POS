@@ -1,0 +1,2 @@
+import {sql} from "@/lib/db";import {NextResponse} from "next/server";import {errorResponse} from "@/lib/http";
+export async function POST(req:Request){try{const {id}=await req.json();const rows=await sql`UPDATE sales SET status='VOID' WHERE id=${id} AND status='COMPLETED' RETURNING id`;if(!rows.length)throw new Error("ไม่พบบิลหรือบิลถูกยกเลิกแล้ว");return NextResponse.json({ok:true})}catch(e){return errorResponse(e)}}

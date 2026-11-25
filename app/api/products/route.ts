@@ -1,0 +1,3 @@
+import {sql} from "@/lib/db";import {productSchema} from "@/lib/validators";import {errorResponse} from "@/lib/http";import {NextResponse} from "next/server";
+export async function GET(){try{return NextResponse.json(await sql`SELECT * FROM products ORDER BY created_at DESC`)}catch(e){return errorResponse(e,500)}}
+export async function POST(req:Request){try{const v=productSchema.parse(await req.json());const rows=await sql`INSERT INTO products(name,price,image_url) VALUES(${v.name},${v.price},${v.image_url||null}) RETURNING *`;return NextResponse.json(rows[0],{status:201})}catch(e){return errorResponse(e)}}
