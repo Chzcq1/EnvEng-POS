@@ -1,8 +1,15 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE IF NOT EXISTS products (
  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL CHECK (length(trim(name)) > 0),
- price NUMERIC(12,2) NOT NULL CHECK (price >= 0), image_url TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+ price NUMERIC(12,2) NOT NULL CHECK (price >= 0), image_url TEXT, category TEXT NOT NULL DEFAULT 'ทั่วไป',
+ sku TEXT UNIQUE, stock INTEGER CHECK (stock IS NULL OR stock >= 0), low_stock_threshold INTEGER NOT NULL DEFAULT 3,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'ทั่วไป';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS sku TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INTEGER;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS low_stock_threshold INTEGER NOT NULL DEFAULT 3;
+CREATE UNIQUE INDEX IF NOT EXISTS products_sku_unique_idx ON products(sku) WHERE sku IS NOT NULL;
 CREATE TABLE IF NOT EXISTS costs (
  id UUID PRIMARY KEY DEFAULT gen_random_uuid(), description TEXT NOT NULL CHECK (length(trim(description)) > 0),
  amount NUMERIC(12,2) NOT NULL CHECK (amount >= 0), created_at TIMESTAMPTZ NOT NULL DEFAULT now()
