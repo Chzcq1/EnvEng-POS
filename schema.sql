@@ -34,3 +34,7 @@ CREATE TABLE IF NOT EXISTS pos_sessions (
 CREATE INDEX IF NOT EXISTS sales_created_at_idx ON sales(created_at DESC);
 CREATE INDEX IF NOT EXISTS sales_status_created_idx ON sales(status, created_at DESC);
 CREATE INDEX IF NOT EXISTS costs_created_at_idx ON costs(created_at DESC);
+
+ALTER TABLE pos_sessions ADD COLUMN IF NOT EXISTS display_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+CREATE TABLE IF NOT EXISTS pos_settings (id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id=1), promo_video_url TEXT, updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+INSERT INTO pos_settings(id) VALUES(1) ON CONFLICT(id) DO NOTHING;
