@@ -14,7 +14,7 @@ export default function Cashier(){
  useEffect(()=>{load();const saved=localStorage.getItem("envi-cashier-code")||"";if(/^\d{4,6}$/.test(saved))setCode(saved)},[]);
  useEffect(()=>{if(!code)return;QRCode.toDataURL(window.location.origin+"/display?code="+code,{width:220,margin:1}).then(setPairQr).catch(()=>{})},[code]);
  async function pair(){if(code)return;try{const r=await request("/api/pair",{method:"POST"});setCode(r.session_code);localStorage.setItem("envi-cashier-code",r.session_code)}catch(e:any){setError(e.message)}}
- async function disconnect(){if(!code)return;if(!window.confirm("ยกเลิกการเชื่อมต่อจอลูกค้าใช่หรือไม่?"))return;try{await request("/api/sessions/"+code,{method:"DELETE"});localStorage.removeItem("envi-cashier-code");setCode("");setPairQr("");setError("")}catch(e:any){setError(e.message)}}
+ async function disconnect(){if(!code)return;try{await request("/api/sessions/"+code,{method:"DELETE"});localStorage.removeItem("envi-cashier-code");setCode("");setPairQr("");setError("")}catch(e:any){setError(e.message)}}
  function add(p:Product){if(p.stock!==null&&p.stock!==undefined&&p.stock<=0){setError("สินค้าหมดสต็อก");return}setCart(old=>{const found=old.find(x=>x.id===p.id);return found?old.map(x=>x.id===p.id?{...x,quantity:x.quantity+1}:x):[...old,{id:p.id,name:p.name,price:Number(p.price),quantity:1,image_url:p.image_url}]})}
  function qty(id:string,d:number){const product=products.find(p=>p.id===id);setCart(old=>old.map(x=>x.id===id?{...x,quantity:Math.max(0,Math.min(product?.stock??Infinity,x.quantity+d))}:x).filter(x=>x.quantity>0))}
  function hold(){if(!cart.length)return;setHeld(h=>[...h,{cart,discount}]);setCart([]);setDiscount(0)}
