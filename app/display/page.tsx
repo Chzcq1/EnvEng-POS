@@ -1,10 +1,10 @@
 "use client";
-import {useEffect,useRef,useState} from "react";
-import {Check,Leaf,Wifi,WifiOff} from "lucide-react";
+import {useEffect,useState} from "react";
+import {Check,Leaf} from "lucide-react";
 type Product={id:string;name:string;price:number|string;image_url:string|null;category?:string};
 type Session={status:string;display_enabled:boolean;cart_json:any[];subtotal:string;discount:string;total:string;payment_method:string|null;received:string;change_amount:string;donation:string;qr_data:string|null;updated_at:string};
 export default function Display(){
- const [code,setCode]=useState("");const [session,setSession]=useState<Session|null>(null);const [products,setProducts]=useState<Product[]>([]);const [video,setVideo]=useState("");const [connected,setConnected]=useState(false);const [seconds,setSeconds]=useState(6);const last=useRef("");
+ const [code,setCode]=useState("");const [session,setSession]=useState<Session|null>(null);const [products,setProducts]=useState<Product[]>([]);const [video,setVideo]=useState("");const [connected,setConnected]=useState(false);const [seconds,setSeconds]=useState(6);
  useEffect(()=>{const q=new URLSearchParams(window.location.search).get("code")||localStorage.getItem("envi-display-code")||"";if(/^\d{4,6}$/.test(q)){setCode(q);localStorage.setItem("envi-display-code",q)}},[]);
  useEffect(()=>{let live=true;fetch("/api/products",{cache:"no-store"}).then(r=>r.ok?r.json():[]).then(v=>{if(live)setProducts(Array.isArray(v)?v:[])}).catch(()=>{});fetch("/api/settings",{cache:"no-store"}).then(r=>r.ok?r.json():{}).then(v=>{if(live)setVideo(v.promo_video_url||"")}).catch(()=>{});return()=>{live=false}},[]);
  useEffect(()=>{if(!code){setConnected(false);return}let live=true;const poll=async()=>{try{const r=await fetch("/api/sessions/"+code,{cache:"no-store"});if(!r.ok)throw new Error("connection");const s:Session=await r.json();if(!live)return;if(!s.display_enabled){localStorage.removeItem("envi-display-code");setCode("");setSession(null);setConnected(false);return}setConnected(true);setSession(s)}catch{if(live)setConnected(false)}};poll();const t=setInterval(poll,900);return()=>{live=false;clearInterval(t)}},[code]);
