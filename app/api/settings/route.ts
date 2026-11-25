@@ -1,0 +1,4 @@
+import {sql} from "@/lib/db";import {NextResponse} from "next/server";import {errorResponse} from "@/lib/http";
+export const dynamic="force-dynamic";
+export async function GET(){try{const rows=await sql`SELECT promo_video_url FROM pos_settings WHERE id=1`;return NextResponse.json(rows[0]||{promo_video_url:null},{headers:{"Cache-Control":"no-store"}})}catch(e){return errorResponse(e,500)}}
+export async function PATCH(req:Request){try{const b=await req.json();const url=b.promo_video_url===null||b.promo_video_url===""?null:new URL(b.promo_video_url).toString();const rows=await sql`INSERT INTO pos_settings(id,promo_video_url,updated_at) VALUES(1,${url},now()) ON CONFLICT(id) DO UPDATE SET promo_video_url=EXCLUDED.promo_video_url,updated_at=now() RETURNING promo_video_url`;return NextResponse.json(rows[0])}catch(e){return errorResponse(e)}}
